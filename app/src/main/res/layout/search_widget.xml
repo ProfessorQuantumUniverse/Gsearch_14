@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/widget_search_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:background="@drawable/widget_background"
+    android:gravity="center_vertical">
+
+    <!-- Google "G" Logo -->
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_launcherr"
+        android:layout_marginEnd="12dp"
+        android:contentDescription="Google Logo" />
+
+    <!-- Suchtext -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Click here to search without AI"
+        android:textSize="16sp"
+        android:textColor="@color/widget_text_color"
+        android:paddingVertical="12dp"
+        android:paddingStart="8dp" />
+
+</LinearLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primäre blaue Farben -->
+    <color name="blue_primary">#1976D2</color>
+    <color name="blue_primary_variant">#0D47A1</color>
+    <color name="blue_secondary">#42A5F5</color>
+    <color name="blue_secondary_variant">#1565C0</color>
+
+    <!-- Oberflächenfarben für Light Theme -->
+    <color name="blue_surface">#FAFAFA</color>
+    <color name="blue_surface_variant">#E3F2FD</color>
+    <color name="blue_background">#FFFFFF</color>
+
+    <!-- Text- und Icon-Farben -->
+    <color name="blue_on_primary">#FFFFFF</color>
+    <color name="blue_on_secondary">#000000</color>
+    <color name="blue_on_surface">#1A1A1A</color>
+    <color name="blue_on_background">#1A1A1A</color>
+
+    <!-- Akzentfarben -->
+    <color name="blue_accent">#2196F3</color>
+    <color name="blue_accent_light">#BBDEFB</color>
+
+    <!-- Fehler-Farben -->
+    <color name="blue_error">#D32F2F</color>
+    <color name="blue_on_error">#FFFFFF</color>
+
+    <!-- Kompatibilität - alte Farben beibehalten -->
+    <color name="purple_200">#BBDEFB</color>
+    <color name="purple_500">#1976D2</color>
+    <color name="purple_700">#0D47A1</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Widget-spezifische Farben -->
+    <color name="widget_background">#FFFFFF</color>
+    <color name="widget_background_dark">#2C2C2C</color>
+    <color name="widget_text_color">#5F6368</color>
+    <color name="widget_text_color_dark">#E8EAED</color>
+    <color name="widget_stroke_color">#E8EAED</color>
+    <color name="widget_stroke_color_dark">#3C4043</color>
+
+    <!-- Dark Theme spezifische Farben -->
+    <color name="blue_surface_dark">#1A1A1A</color>
+    <color name="blue_surface_variant_dark">#2C2C2C</color>
+    <color name="blue_background_dark">#121212</color>
+    <color name="blue_on_surface_dark">#E0E0E0</color>
+    <color name="blue_on_background_dark">#FFFFFF</color>
+    <color name="blue_primary_dark">#64B5F6</color>
+    <color name="blue_secondary_dark">#90CAF9</color>
+</resources>

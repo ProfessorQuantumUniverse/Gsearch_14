@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.Theme.Gsearch14" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primäre Farben -->
+        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorPrimaryVariant">@color/blue_primary_variant</item>
+        <item name="colorOnPrimary">@color/blue_on_primary</item>
+
+        <!-- Sekundäre Farben -->
+        <item name="colorSecondary">@color/blue_secondary</item>
+        <item name="colorSecondaryVariant">@color/blue_secondary_variant</item>
+        <item name="colorOnSecondary">@color/blue_on_secondary</item>
+
+        <!-- Oberflächenfarben -->
+        <item name="colorSurface">@color/blue_surface</item>
+        <item name="colorOnSurface">@color/blue_on_surface</item>
+        <item name="colorSurfaceVariant">@color/blue_surface_variant</item>
+
+        <!-- Hintergrundfarben -->
+        <item name="android:colorBackground">@color/blue_background</item>
+        <item name="colorOnBackground">@color/blue_on_background</item>
+
+        <!-- Fehlerfarben -->
+        <item name="colorError">@color/blue_error</item>
+        <item name="colorOnError">@color/blue_on_error</item>
+
+        <!-- Material3 spezifische Farben -->
+        <item name="colorSurfaceContainerLowest">@color/blue_background</item>
+        <item name="colorSurfaceContainer">@color/blue_surface_variant</item>
+
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">@color/blue_primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Navigation Bar -->
+        <item name="android:navigationBarColor">@color/blue_surface</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+</resources>

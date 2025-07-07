@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget-spezifische Farben für Dark Mode -->
+    <color name="widget_background">@color/widget_background_dark</color>
+    <color name="widget_text_color">@color/widget_text_color_dark</color>
+    <color name="widget_stroke_color">@color/widget_stroke_color_dark</color>
+</resources>
+
