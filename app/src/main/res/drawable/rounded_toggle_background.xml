@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Leicht abgerundeter Hintergrund -->
+    <corners android:radius="12dp" />
+
+    <!-- Subtiler Hintergrund mit Theme-Farbe -->
+    <solid android:color="?attr/colorSurfaceContainerHigh" />
+
+    <!-- Sanfter Rahmen für Definition -->
+    <stroke
+        android:width="1dp"
+        android:color="?attr/colorOutlineVariant" />
+
+</shape>
+

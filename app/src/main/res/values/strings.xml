@@ -1,4 +1,25 @@
 <resources>
     <string name="app_name">Gsearch14</string>
     <string name="widget_description">Google Search Widget - Schnellzugriff auf die Suche</string>
+
+    <!-- KI Toggle Strings - Fokus auf KI-freie Suche -->
+    <string name="ai_toggle_on">AI</string>
+    <string name="ai_toggle_off">No AI</string>
+    <string name="ai_status_enabled">with AI</string>
+    <string name="ai_status_disabled">without AI</string>
+    <string name="ai_activated_toast">AI temporarily activated</string>
+    <string name="ai_deactivated_toast">Back to AI free search</string>
+
+    <!-- Weitere UI Strings -->
+    <string name="search_hint">What are you looking for?</string>
+    <string name="search_button">Search</string>
+    <string name="app_title">No AI Google Search</string>
+    <string name="search_type_all">All</string>
+    <string name="search_type_images">Images</string>
+    <string name="search_type_videos">Videos</string>
+    <string name="search_type_news">News</string>
+    <string name="search_history_title">Search History</string>
+    <string name="delete_history_button">Delete History</string>
+    <string name="theme_toggle_description">Change Theme</string>
+    <string name="history_button_description">Delete Search History</string>
 </resources>

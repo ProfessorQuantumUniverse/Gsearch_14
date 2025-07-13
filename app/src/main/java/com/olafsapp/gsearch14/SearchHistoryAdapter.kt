@@ -14,7 +14,8 @@ import java.util.*
 
 class SearchHistoryAdapter(
     private var historyList: MutableList<SearchHistoryItem>,
-    private val onItemClick: (SearchHistoryItem) -> Unit
+    private val onItemClick: (SearchHistoryItem) -> Unit,
+    private val onItemDelete: (SearchHistoryItem, Int) -> Unit
 ) : RecyclerView.Adapter<SearchHistoryAdapter.HistoryViewHolder>() {
 
     class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -53,8 +54,14 @@ class SearchHistoryAdapter(
         }
         holder.searchTypeIcon.setImageResource(iconRes)
 
-        // AI-Icon anzeigen/verstecken
-        holder.aiIcon.visibility = if (item.useAI) View.VISIBLE else View.GONE
+        // AI-Icon immer anzeigen, aber unterschiedliche Icons für KI an/aus
+        holder.aiIcon.visibility = View.VISIBLE
+        if (item.useAI) {
+            holder.aiIcon.setImageResource(R.drawable.ic_smart_toy) // KI-Symbol
+        } else {
+            holder.aiIcon.setImageResource(R.drawable.ic_launcherr) // "NO AI" Symbol
+            holder.aiIcon.imageTintList = null // Entfernt alle Tint-Farben // "NO AI" Symbol
+        }
 
         // Item-Animation beim Laden
         holder.card.apply {
@@ -109,6 +116,12 @@ class SearchHistoryAdapter(
             }
             false
         }
+
+        // Löschen-Handler
+        holder.card.setOnLongClickListener {
+            onItemDelete(item, position)
+            true
+        }
     }
 
     override fun getItemCount(): Int = historyList.size
@@ -117,5 +130,20 @@ class SearchHistoryAdapter(
         historyList.clear()
         historyList.addAll(newHistory)
         notifyDataSetChanged()
+    }
+
+    fun removeItem(position: Int) {
+        if (position >= 0 && position < historyList.size) {
+            historyList.removeAt(position)
+            notifyItemRemoved(position)
+            // Wichtig: Benachrichtigung über Positionsänderungen nach dem Entfernen
+            if (position < historyList.size) {
+                notifyItemRangeChanged(position, historyList.size - position)
+            }
+        }
+    }
+
+    fun getItemAtPosition(position: Int): SearchHistoryItem {
+        return historyList[position]
     }
 }

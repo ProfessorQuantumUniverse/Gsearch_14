@@ -8,12 +8,16 @@
     tools:context=".MainActivity">
 
     <!-- Hauptinhalt -->
+
+    <!-- Schwebende Bubble-Toolbar - floatet über dem Inhalt -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="16dp"
-        android:paddingBottom="16dp">
+        android:paddingBottom="16dp"
+        app:layout_anchor="@+id/nestedScrollView"
+        app:layout_anchorGravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,12 +44,12 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="No AI Google Search"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorPrimary"
+                        android:layout_marginBottom="16dp"
                         android:gravity="center"
-                        android:layout_marginBottom="16dp" />
+                        android:text="@string/app_title"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
                     <!-- Suchfeld mit verbessertem Design -->
                     <com.google.android.material.textfield.TextInputLayout
@@ -53,7 +57,7 @@
                         style="@style/Widget.Material3.TextInputLayout.FilledBox"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:hint="What are you looking for?"
+                        android:hint="@string/search_hint"
                         app:endIconMode="clear_text"
                         app:startIconDrawable="@drawable/ic_search">
 
@@ -85,7 +89,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true"
-                            android:text="All"
+                            android:text="@string/search_type_all"
                             app:chipIcon="@drawable/ic_search" />
 
                         <com.google.android.material.chip.Chip
@@ -93,7 +97,7 @@
                             style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Images"
+                            android:text="@string/search_type_images"
                             app:chipIcon="@drawable/ic_image" />
 
                         <com.google.android.material.chip.Chip
@@ -101,7 +105,7 @@
                             style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Videos"
+                            android:text="@string/search_type_videos"
                             app:chipIcon="@drawable/ic_video" />
 
                         <com.google.android.material.chip.Chip
@@ -109,7 +113,7 @@
                             style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="News"
+                            android:text="@string/search_type_news"
                             app:chipIcon="@drawable/ic_news" />
 
                     </com.google.android.material.chip.ChipGroup>
@@ -119,24 +123,79 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
 
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/aiToggle"
-                            android:layout_width="0dp"
+                        <!-- KI Auswahl - Kompakter -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="(De)activate AI"
-                            android:textSize="14sp" />
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"
+                            android:clipToPadding="false"
+                            android:clipChildren="false">
 
+                            <!-- Ohne KI Label -->
+                            <TextView
+                                android:id="@+id/aiLabelOff"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Without AI"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:minWidth="0dp"
+                                android:ellipsize="none"
+                                android:maxLines="1"
+                                android:layout_marginEnd="12dp"
+                                android:clipToPadding="false" />
+
+                            <!-- KI Toggle Switch - Optimiert -->
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/aiToggleSwitch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="false"
+                                android:scaleX="0.8"
+                                android:scaleY="0.8"
+                                android:thumbTint="@color/ai_switch_thumb"
+                                android:trackTint="@color/ai_switch_track"
+                                app:thumbTint="@color/ai_switch_thumb"
+                                app:trackTint="@color/ai_switch_track"
+                                android:layout_marginHorizontal="8dp" />
+
+                            <!-- Mit KI Label -->
+                            <TextView
+                                android:id="@+id/aiLabelOn"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="With AI"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="12sp"
+                                android:gravity="center"
+                                android:minWidth="0dp"
+                                android:ellipsize="none"
+                                android:maxLines="1"
+                                android:layout_marginStart="12dp"
+                                android:clipToPadding="false" />
+
+                        </LinearLayout>
+
+                        <!-- Search Button in neuer Zeile -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/searchButton"
-                            style="@style/Widget.Material3.Button.Icon"
-                            android:layout_width="wrap_content"
+                            style="@style/Widget.Material3.Button"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:text="Search"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/search_button"
                             app:icon="@drawable/ic_search" />
 
                     </LinearLayout>
@@ -170,6 +229,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
+                            android:contentDescription="@string/search_history_title"
                             android:src="@drawable/ic_history"
                             app:tint="@color/purple_500" />
 
@@ -178,7 +238,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Search History"
+                            android:text="@string/search_history_title"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -187,7 +247,7 @@
                             style="@style/Widget.Material3.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Delete History"
+                            android:text="@string/delete_history_button"
                             android:textSize="12sp" />
 
                     </LinearLayout>
@@ -207,7 +267,6 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Schwebende Bubble-Toolbar - floatet über dem Inhalt -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bubbleToolbar"
         android:layout_width="wrap_content"
@@ -235,8 +294,8 @@
                 app:icon="@drawable/ic_settings"
                 app:iconSize="22dp"
                 app:iconTint="?attr/colorOnPrimary"
-                android:backgroundTint="?attr/colorPrimary"
-                android:contentDescription="Theme wechseln"
+                app:backgroundTint="?attr/colorPrimary"
+                android:contentDescription="@string/theme_toggle_description"
                 app:rippleColor="?attr/colorOnPrimary"
                 android:layout_marginEnd="8dp"
                 app:cornerRadius="16dp" />
@@ -249,9 +308,8 @@
                 app:icon="@drawable/ic_history"
                 app:iconSize="22dp"
                 app:iconTint="?attr/colorOnSecondary"
-                android:backgroundTint="?attr/colorSecondary"
-                android:contentDescription="Delete Search History"
-                app:rippleColor="?attr/colorOnSecondary"
+                app:backgroundTint="?attr/colorSecondary"
+                android:contentDescription="@string/history_button_description"
                 android:layout_marginStart="8dp"
                 app:cornerRadius="16dp" />
 
@@ -264,12 +322,14 @@
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:fitsSystemWindows="true">
 
         <WebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
