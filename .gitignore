@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Release signing — never commit keystores or their passwords
+/keystore.properties
+*.jks
+*.keystore
+
+# Local release artefacts produced by Android Studio's build/generate flow
+/app/release/

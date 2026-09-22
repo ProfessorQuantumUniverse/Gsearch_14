@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_wordmark_line1">Suche nach</string>
+    <string name="app_wordmark_line2">menschlichem Wissen</string>
+
+    <!-- Suche -->
+    <string name="search_hint">Wonach suchst du?</string>
+    <string name="search_action">Suchen</string>
+    <string name="search_clear">Eingabe löschen</string>
+    <string name="search_empty_query">Gib einen Suchbegriff ein</string>
+
+    <!-- Kategorien -->
+    <string name="vertical_web">Web</string>
+    <string name="vertical_images">Bilder</string>
+    <string name="vertical_videos">Videos</string>
+    <string name="vertical_news">News</string>
+
+    <!-- KI-Schalter -->
+    <string name="ai_free_on">Nur menschliche Ergebnisse</string>
+    <string name="ai_free_off">KI-Antworten erlaubt</string>
+    <string name="ai_free_on_detail">Ergebnisse sind reine Links, von Menschen geschrieben.</string>
+    <string name="ai_free_off_detail">Die Suchmaschine darf eine generierte Zusammenfassung voranstellen.</string>
+    <string name="ai_free_unsupported">%1$s zeigt grundsätzlich keine KI-Antworten.</string>
+    <string name="ai_free_engine_setting">%1$s bietet das nur in den eigenen Einstellungen an.</string>
+
+    <!-- Suchmaschinen -->
+    <string name="engine_switcher_title">Suchmaschine</string>
+    <string name="engine_switcher_subtitle">Zum Wechseln wischen. Deine Wahl wird gemerkt.</string>
+    <string name="engine_selected">%1$s ausgewählt</string>
+    <string name="engine_note_google">Google mit dem reinen Web-Filter (udm=14): nur Links, keine KI-Übersicht.</string>
+    <string name="engine_note_marginalia">Findet kleine, nicht-kommerzielle Textseiten. Das Web vor SEO.</string>
+    <string name="engine_note_wikipedia">Direkt in die Enzyklopädie, in deiner Gerätesprache.</string>
+
+    <!-- Vorschläge -->
+    <string name="suggestion_from_history">Aus deinem Verlauf</string>
+    <string name="suggestion_fill">Vorschlag übernehmen</string>
+
+    <!-- Verlauf und Lesezeichen -->
+    <string name="library_title">Bibliothek</string>
+    <string name="tab_history">Verlauf</string>
+    <string name="tab_bookmarks">Lesezeichen</string>
+    <string name="history_title">Letzte Suchen</string>
+    <string name="history_empty_title">Noch nichts da</string>
+    <string name="history_empty_body">Deine Suchen landen hier und lassen sich mit einem Tipp wiederholen.</string>
+    <string name="history_filter_hint">Verlauf durchsuchen</string>
+    <string name="history_clear">Verlauf löschen</string>
+    <string name="history_clear_confirm_title">Verlauf löschen?</string>
+    <string name="history_clear_confirm_body">Angeheftete Suchen bleiben erhalten. Das lässt sich nicht rückgängig machen.</string>
+    <string name="history_cleared">Verlauf gelöscht</string>
+    <string name="history_pin">Anheften</string>
+    <string name="history_unpin">Lösen</string>
+    <string name="history_pinned_section">Angeheftet</string>
+    <string name="history_incognito_note">Inkognito ist an. Neue Suchen werden nicht gespeichert.</string>
+    <string name="bookmarks_empty_title">Noch keine Lesezeichen</string>
+    <string name="bookmarks_empty_body">Speichere eine Ergebnisseite im Reader, dann taucht sie hier auf.</string>
+    <string name="bookmark_removed">Lesezeichen entfernt</string>
+    <string name="bookmark_add">Lesezeichen hinzufügen</string>
+    <string name="bookmark_remove">Lesezeichen entfernen</string>
+    <string name="bookmarks_clear">Alle Lesezeichen entfernen</string>
+
+    <!-- Ergebnisse -->
+    <string name="results_back">Zurück</string>
+    <string name="results_reload">Neu laden</string>
+    <string name="results_share">Teilen</string>
+    <string name="results_open_external">Im Browser öffnen</string>
+    <string name="results_offline_title">Keine Verbindung</string>
+    <string name="results_offline_body">Die Seite konnte nicht geladen werden. Prüfe deine Verbindung und versuch es nochmal.</string>
+    <string name="results_retry">Erneut versuchen</string>
+    <string name="results_loading">Ergebnisse werden geladen</string>
+
+    <!-- Einstellungen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_section_look">Aussehen</string>
+    <string name="settings_section_search">Suche</string>
+    <string name="settings_section_privacy">Privatsphäre</string>
+    <string name="settings_section_about">Über</string>
+
+    <string name="settings_theme">Design</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+
+    <string name="settings_dynamic_color">Material-You-Farben</string>
+    <string name="settings_dynamic_color_body">Palette aus deinem Hintergrundbild übernehmen.</string>
+    <string name="settings_accent">Akzentfarbe</string>
+    <string name="accent_signal">Signal</string>
+    <string name="accent_forest">Wald</string>
+    <string name="accent_ember">Glut</string>
+    <string name="accent_ink">Tinte</string>
+    <string name="accent_violet">Violett</string>
+
+    <string name="settings_pure_black">Tiefschwarzer Dunkelmodus</string>
+    <string name="settings_pure_black_body">Echtes Schwarz, schont OLED-Displays.</string>
+    <string name="settings_haptics">Haptisches Feedback</string>
+    <string name="settings_haptics_body">Ein kleiner Impuls beim Umschalten und Bestätigen.</string>
+
+    <string name="settings_open_target">Ergebnisse öffnen in</string>
+    <string name="open_in_app">App-Reader</string>
+    <string name="open_in_app_body">Bleibt in Gsearch, mit Ziehen zum Aktualisieren und Lesezeichen.</string>
+    <string name="open_custom_tab">Custom Tab</string>
+    <string name="open_custom_tab_body">Engine und Logins deines Browsers, trotzdem in der App.</string>
+    <string name="open_external">Standardbrowser</string>
+    <string name="open_external_body">Übergibt die Suche an eine andere App.</string>
+
+    <string name="settings_suggestions">Suchvorschläge</string>
+    <string name="settings_suggestions_body">Beim Tippen Vervollständigungen der aktiven Suchmaschine abrufen.</string>
+    <string name="settings_incognito">Inkognito</string>
+    <string name="settings_incognito_body">Suchen ausführen, ohne sie im Verlauf zu speichern.</string>
+    <string name="settings_block_cookies">Drittanbieter-Cookies blockieren</string>
+    <string name="settings_block_cookies_body">Gilt für den App-Reader.</string>
+    <string name="settings_clear_browsing_data">Browserdaten der App löschen</string>
+    <string name="settings_clear_browsing_data_body">Cookies und Cache des App-Readers.</string>
+    <string name="settings_browsing_data_cleared">Browserdaten gelöscht</string>
+
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_source">Quellcode</string>
+    <string name="settings_licence">Lizenziert unter der GNU GPL v3</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Ohne KI suchen, direkt vom Startbildschirm.</string>
+    <string name="widget_hint">Ohne KI suchen</string>
+
+    <!-- Allgemein -->
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_undo">Rückgängig</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="action_library">Verlauf und Lesezeichen</string>
+</resources>

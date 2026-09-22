@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The app mark: a globe seen through a magnifier. Drawn entirely with strokes so
+     it stays crisp at every density and tints cleanly as a themed icon. All geometry
+     sits inside the adaptive-icon safe zone (the central 72dp of the 108dp canvas). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Globe -->
+    <path
+        android:pathData="M22,44a22,22 0 1,0 44,0a22,22 0 1,0 -44,0"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M22,44L66,44"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M27,33L61,33"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M27,55L61,55"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M33.5,44a10.5,22 0 1,0 21,0a10.5,22 0 1,0 -21,0"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round" />
+    <!-- Magnifier -->
+    <path
+        android:pathData="M48,63a15,15 0 1,0 30,0a15,15 0 1,0 -30,0"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="6.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M73,73L80,80"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round" />
+</vector>
