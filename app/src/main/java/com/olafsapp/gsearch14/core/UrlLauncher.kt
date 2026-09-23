@@ -1,6 +1,5 @@
 package com.olafsapp.gsearch14.core
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
@@ -26,7 +25,8 @@ object UrlLauncher {
             .build()
         try {
             intent.launchUrl(context, url.toUri())
-        } catch (_: ActivityNotFoundException) {
+        } catch (_: RuntimeException) {
+            // ActivityNotFoundException, or a SecurityException from a misbehaving browser.
             openExternal(context, url)
         }
     }
@@ -38,7 +38,7 @@ object UrlLauncher {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
         )
         true
-    } catch (_: ActivityNotFoundException) {
+    } catch (_: RuntimeException) {
         false
     }
 
@@ -49,7 +49,7 @@ object UrlLauncher {
             putExtra(Intent.EXTRA_TEXT, url)
             subject?.let { putExtra(Intent.EXTRA_SUBJECT, it) }
         }
-        context.startActivity(Intent.createChooser(send, null))
+        runCatching { context.startActivity(Intent.createChooser(send, null)) }
     }
 
     /** Best-effort readable label for a URL: the host without a leading `www.`. */

@@ -191,7 +191,9 @@ class LibraryRepository(
 
     private fun readLegacyHistory(): List<HistoryEntry> {
         val prefs = context.getSharedPreferences("search_prefs", Context.MODE_PRIVATE)
-        val raw = prefs.getString("search_history", null) ?: return emptyList()
+        // Untyped read: getString throws if the key ever held something other than a string.
+        val raw = runCatching { prefs.all["search_history"] as? String }.getOrNull()
+            ?: return emptyList()
         return runCatching {
             libraryJson.parseToJsonElement(raw).let { element ->
                 element.jsonArrayOrNull()?.mapNotNull { item ->

@@ -2,14 +2,19 @@ package com.olafsapp.gsearch14.widget
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.action.actionStartActivity
@@ -26,8 +31,11 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import com.olafsapp.gsearch14.BuildConfig
 import com.olafsapp.gsearch14.MainActivity
 import com.olafsapp.gsearch14.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Home screen widget, rewritten with Glance.
@@ -45,13 +53,25 @@ class SearchWidget : GlanceAppWidget() {
         }
     }
 
+    /**
+     * The picker preview on Android 15+. Rendering the real composable means the preview
+     * can never drift from the widget the user actually gets.
+     */
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        provideContent {
+            GlanceTheme {
+                WidgetContent(context)
+            }
+        }
+    }
+
     @Composable
     private fun WidgetContent(context: Context) {
         // A plain intent rather than action parameters: the flag has to survive as a real
-        // extra so MainActivity can focus the input and pop the keyboard.
-        val openSearch = actionStartActivity(
+        // extra so MainActivity can open its quick-search layout with the keyboard up.
+        val openSearch: Action = actionStartActivity(
             Intent(context, MainActivity::class.java)
-                .setAction(Intent.ACTION_MAIN)
+                .setAction(MainActivity.ACTION_QUICK_SEARCH)
                 .putExtra(MainActivity.EXTRA_FROM_WIDGET, true),
         )
 
@@ -106,4 +126,35 @@ class SearchWidget : GlanceAppWidget() {
 
 class SearchWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = SearchWidget()
+}
+
+/**
+ * Publishes the generated widget preview to the launcher's widget picker (Android 15+).
+ *
+ * Older releases fall back to `previewLayout` / `previewImage` in `search_widget_info.xml`.
+ * The platform rate-limits this call, so it runs once per app version and only counts as
+ * done after the system accepted it.
+ */
+object SearchWidgetPreviews {
+
+    private const val PREFS = "widget_prefs"
+    private const val KEY_PUBLISHED_VERSION = "preview_published_version"
+
+    fun publishIfNeeded(context: Context, scope: CoroutineScope) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) return
+        val appContext = context.applicationContext
+        scope.launch {
+            val prefs = appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            if (prefs.getInt(KEY_PUBLISHED_VERSION, 0) == BuildConfig.VERSION_CODE) return@launch
+
+            val result = runCatching {
+                GlanceAppWidgetManager(appContext).setWidgetPreviews(SearchWidgetReceiver::class)
+            }.onFailure { Log.w("Gsearch", "Publishing widget preview failed", it) }
+                .getOrNull()
+
+            if (result == GlanceAppWidgetManager.SET_WIDGET_PREVIEWS_RESULT_SUCCESS) {
+                prefs.edit { putInt(KEY_PUBLISHED_VERSION, BuildConfig.VERSION_CODE) }
+            }
+        }
+    }
 }

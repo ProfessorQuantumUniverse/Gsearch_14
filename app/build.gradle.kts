@@ -7,9 +7,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Optional release signing: drop a keystore.properties next to the project root with
-// storeFile / storePassword / keyAlias / keyPassword to sign release builds from the CLI.
-// Without it, release builds stay unsigned and Android Studio's signing wizard keeps working.
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use { load(it) }
@@ -23,8 +20,8 @@ android {
         applicationId = "com.olafsapp.gsearch14"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 4
-        versionName = "4.0"
+        versionCode = 5
+        versionName = "4.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -137,6 +134,8 @@ dependencies {
     // App widget
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+    // Overrides the outdated WorkManager Glance depends on; see libs.versions.toml.
+    implementation(libs.androidx.work.runtime)
 
     // Kotlin ecosystem
     implementation(libs.kotlinx.serialization.json)

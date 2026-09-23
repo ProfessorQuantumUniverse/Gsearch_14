@@ -114,45 +114,48 @@ fun ResultsScreen(
     val spinnerColor = MaterialTheme.colorScheme.primary.toArgb()
     val spinnerTrack = MaterialTheme.colorScheme.surfaceContainerHigh.toArgb()
 
+    // Creating a WebView throws when the system WebView is missing, disabled or being
+    // updated at that moment — common enough on tablets and de-Googled devices.
     val webView = remember {
-        WebView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-            )
-            settings.apply {
-                javaScriptEnabled = true
-                domStorageEnabled = true
-                loadWithOverviewMode = true
-                useWideViewPort = true
-                builtInZoomControls = true
-                displayZoomControls = false
-                setSupportZoom(true)
-                // Deliberately left at the platform default: a truthful user agent gets the
-                // current mobile layout from every engine.
-                mediaPlaybackRequiresUserGesture = true
-                safeBrowsingEnabled = true
-            }
-        }
+        runCatching { createWebView(context) }.getOrNull()
     }
+    if (webView == null) {
+        // No reader available: hand the page to a browser rather than crash.
+        LaunchedEffect(Unit) {
+            UrlLauncher.openExternal(context, url)
+            onBack()
+        }
+        Box(
+            modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        )
+        return
+    }
+
+    // Set once the renderer process has died and the view has been destroyed. Every later
+    // call into the WebView has to check it.
+    var rendererGone by remember { mutableStateOf(false) }
 
     val swipeRefresh = remember {
         SwipeRefreshLayout(context).apply {
             addView(webView)
-            setOnRefreshListener { webView.reload() }
+            setOnRefreshListener { if (!rendererGone) webView.reload() else isRefreshing = false }
         }
     }
 
     // Keep the WebView's own dark rendering in step with the app theme.
     LaunchedEffect(darkTheme) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+        if (!rendererGone && WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(webView.settings, darkTheme)
         }
     }
 
     LaunchedEffect(blockThirdPartyCookies) {
-        CookieManager.getInstance()
-            .setAcceptThirdPartyCookies(webView, !blockThirdPartyCookies)
+        if (!rendererGone) {
+            CookieManager.getInstance()
+                .setAcceptThirdPartyCookies(webView, !blockThirdPartyCookies)
+        }
     }
 
     LaunchedEffect(webView) {
@@ -194,6 +197,7 @@ fun ResultsScreen(
                 view: WebView?,
                 detail: RenderProcessGoneDetail?,
             ): Boolean {
+                rendererGone = true
                 swipeRefresh.removeAllViews()
                 view?.destroy()
                 loading = false
@@ -214,20 +218,22 @@ fun ResultsScreen(
     }
 
     LaunchedEffect(url) {
-        webView.loadUrl(url)
+        if (!rendererGone) webView.loadUrl(url)
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            webView.stopLoading()
             swipeRefresh.removeAllViews()
-            webView.destroy()
+            if (!rendererGone) {
+                webView.stopLoading()
+                webView.destroy()
+            }
         }
     }
 
     // In-page history first, then out of the screen — the behaviour a browser has.
     BackHandler {
-        if (webView.canGoBack()) webView.goBack() else onBack()
+        if (!rendererGone && webView.canGoBack()) webView.goBack() else onBack()
     }
 
     Column(
@@ -241,7 +247,7 @@ fun ResultsScreen(
             engine = engine,
             isBookmarked = isBookmarked,
             onBack = onBack,
-            onReload = { webView.reload() },
+            onReload = { if (!rendererGone) webView.reload() },
             onShare = { UrlLauncher.share(context, currentUrl, pageTitle) },
             onOpenExternal = { UrlLauncher.openExternal(context, currentUrl) },
             onToggleBookmark = { onToggleBookmark(pageTitle, currentUrl) },
@@ -283,8 +289,14 @@ fun ResultsScreen(
             ) {
                 ErrorState(
                     onRetry = {
-                        failed = false
-                        webView.reload()
+                        if (rendererGone) {
+                            // The dead view cannot be revived; leaving and reopening the
+                            // page builds a fresh one.
+                            onBack()
+                        } else {
+                            failed = false
+                            webView.reload()
+                        }
                     },
                 )
             }
@@ -450,6 +462,28 @@ private fun LoadingBar(progress: Float, visible: Boolean) {
         )
     }
 }
+
+@SuppressLint("SetJavaScriptEnabled")
+private fun createWebView(context: android.content.Context): WebView =
+    WebView(context).apply {
+        layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT,
+        )
+        settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            loadWithOverviewMode = true
+            useWideViewPort = true
+            builtInZoomControls = true
+            displayZoomControls = false
+            setSupportZoom(true)
+            // Deliberately left at the platform default: a truthful user agent gets the
+            // current mobile layout from every engine.
+            mediaPlaybackRequiresUserGesture = true
+            safeBrowsingEnabled = true
+        }
+    }
 
 @Composable
 private fun ErrorState(onRetry: () -> Unit) {

@@ -104,12 +104,16 @@ class SettingsRepository(private val context: Context) {
             if (prefs[Keys.MIGRATED] == true) return@edit
             val legacy = context.getSharedPreferences("search_prefs", Context.MODE_PRIVATE)
 
+            // Read through `all` rather than the typed getters: those throw a
+            // ClassCastException if a value was ever stored with another type.
+            val stored = runCatching { legacy.all }.getOrNull().orEmpty()
+
             // AppCompatDelegate constants: 1 = MODE_NIGHT_NO, 2 = MODE_NIGHT_YES.
-            when (legacy.getInt("night_mode", -1)) {
+            when (stored["night_mode"] as? Int) {
                 1 -> prefs[Keys.THEME_MODE] = ThemeMode.LIGHT.name
                 2 -> prefs[Keys.THEME_MODE] = ThemeMode.DARK.name
             }
-            if (legacy.getString("browser_choice", "webview") == "external") {
+            if (stored["browser_choice"] as? String == "external") {
                 prefs[Keys.OPEN_TARGET] = OpenTarget.EXTERNAL_BROWSER.name
             }
             prefs[Keys.MIGRATED] = true

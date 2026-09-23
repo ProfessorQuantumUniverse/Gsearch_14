@@ -14,6 +14,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -115,6 +116,9 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_FROM_WIDGET = "from_widget"
+
+        /** Distinct action for widget taps, so their PendingIntent never collides. */
+        const val ACTION_QUICK_SEARCH = "com.olafsapp.gsearch14.action.QUICK_SEARCH"
     }
 }
 
@@ -133,6 +137,12 @@ private fun GsearchApp(
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
 
     val toolbarColor = MaterialTheme.colorScheme.surfaceContainerLow.toArgb()
+
+    // A widget tap while a result page or the library is open should still land on the
+    // search field, not on whatever screen happened to be on top.
+    LaunchedEffect(launchedFromWidget) {
+        if (launchedFromWidget) navController.popBackStack(HomeRoute, inclusive = false)
+    }
 
     /**
      * Routes a finished search to wherever the user wants results: the in-app reader, a

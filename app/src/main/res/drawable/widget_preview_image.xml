@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget picker image for Android 8-11. Android 12+ renders layout/widget_preview
+     instead, and Android 15+ gets a preview generated from the Glance widget itself. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="64dp"
+    android:viewportWidth="288"
+    android:viewportHeight="64">
+    <!-- Pill -->
+    <path
+        android:fillColor="@color/widget_container"
+        android:pathData="M32,4h224a28,28 0,0 1,0 56h-224a28,28 0,0 1,0 -56z" />
+    <!-- Brand mark -->
+    <path
+        android:fillColor="@color/widget_primary"
+        android:pathData="M34,32m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0" />
+    <!-- Hint text -->
+    <path
+        android:fillColor="@color/widget_on_container"
+        android:fillAlpha="0.7"
+        android:pathData="M64,28h112a4,4 0,0 1,0 8h-112a4,4 0,0 1,0 -8z" />
+</vector>

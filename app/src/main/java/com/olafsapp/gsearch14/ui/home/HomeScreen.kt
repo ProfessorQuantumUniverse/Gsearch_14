@@ -1,5 +1,6 @@
 package com.olafsapp.gsearch14.ui.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.expandVertically
@@ -7,9 +8,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -44,6 +48,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,6 +82,8 @@ import com.olafsapp.gsearch14.ui.components.InlineNotice
 import com.olafsapp.gsearch14.ui.components.SectionHeader
 import com.olafsapp.gsearch14.ui.components.VerticalSelector
 import com.olafsapp.gsearch14.ui.theme.Motion
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 private const val RECENT_PREVIEW_COUNT = 4
@@ -85,7 +94,13 @@ private const val RECENT_PREVIEW_COUNT = 4
  * Everything above the fold is one stack: wordmark, input, controls, engine rail, recent
  * searches. When suggestions appear they take over the lower half rather than pushing it
  * down, so the layout never jumps under the user's thumb.
+ *
+ * Opened from the widget, the screen starts in a slim quick-search layout instead: just the
+ * focused field with the keyboard up, the result-type picker and the engine rail. As soon
+ * as the field loses focus (keyboard dismissed, back, a tap outside, a search) the rest of
+ * the screen animates in and it is the normal home screen again.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HomeScreen(
     settings: AppSettings,
@@ -113,24 +128,53 @@ fun HomeScreen(
     val haptics = rememberHaptics()
     val focusManager = LocalFocusManager.current
     var fieldFocused by remember { mutableStateOf(false) }
+    // Seeded from the launch flag so a widget start never flashes the full layout first.
+    var quickMode by rememberSaveable { mutableStateOf(focusInputOnStart) }
+    // Visibility rather than height: a floating keyboard is visible but reports no inset.
+    val imeVisible by rememberUpdatedState(WindowInsets.isImeVisible)
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val emptyQueryMessage = stringResource(R.string.search_empty_query)
 
-    // Drives the one-off entrance of the whole screen.
-    val entrance = remember { Animatable(0f) }
+    // Drives the one-off entrance of the whole screen. Skipped for a widget start, where
+    // the point is to be typing as early as possible.
+    val entrance = remember { Animatable(if (focusInputOnStart) 1f else 0f) }
     LaunchedEffect(Unit) {
         entrance.animateTo(1f, Motion.effectsSlow())
     }
 
-    // Launched from the widget: focus the field so the keyboard is already up. The flag is
-    // cleared only after the focus request, so a recomposition cannot cancel it first.
+    // Launched from the widget: switch to the quick layout with an empty, focused field
+    // and the keyboard up. The flag is cleared only after the focus request, so a
+    // recomposition cannot cancel it first.
     LaunchedEffect(focusInputOnStart) {
         if (focusInputOnStart) {
+            quickMode = true
+            onQueryChange("")
             focusRequester.requestFocus()
             keyboard?.show()
             onWidgetLaunchHandled()
         }
+    }
+
+    // Quick mode ends the moment the field loses focus, after having had it.
+    LaunchedEffect(quickMode) {
+        if (!quickMode) return@LaunchedEffect
+        snapshotFlow { fieldFocused }.dropWhile { !it }.first { !it }
+        quickMode = false
+    }
+
+    // Hiding the keyboard (back, or its own dismiss key) leaves a Compose field focused,
+    // so treat that as leaving the field too.
+    LaunchedEffect(quickMode) {
+        if (!quickMode) return@LaunchedEffect
+        snapshotFlow { imeVisible }.dropWhile { !it }.first { !it }
+        focusManager.clearFocus()
+    }
+
+    // With a hardware keyboard there is no IME to dismiss; back still leaves quick mode.
+    BackHandler(enabled = quickMode) {
+        focusManager.clearFocus()
+        quickMode = false
     }
 
     // Tied to focus, not just to the text. Returning from a result page leaves the query in
@@ -150,7 +194,20 @@ fun HomeScreen(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .then(
+                // A tap on empty space in the quick layout means "done with the field".
+                if (quickMode) {
+                    Modifier.clickable(interactionSource = null, indication = null) {
+                        focusManager.clearFocus()
+                    }
+                } else {
+                    Modifier
+                },
+            ),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -160,14 +217,23 @@ fun HomeScreen(
                 .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
                 .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
         ) {
-            HomeHeader(
-                scrollOffset = { scrollState.value.toFloat() },
-                onOpenLibrary = onOpenLibrary,
-                onOpenSettings = onOpenSettings,
-                modifier = Modifier.graphicsLayer { alpha = entrance.value },
-            )
+            AnimatedVisibility(
+                visible = !quickMode,
+                enter = fadeIn(Motion.effectsDefault()) + expandVertically(Motion.sizeSpring),
+                exit = fadeOut(Motion.effectsFast()) + shrinkVertically(Motion.sizeSpring),
+            ) {
+                Column {
+                    HomeHeader(
+                        scrollOffset = { scrollState.value.toFloat() },
+                        onOpenLibrary = onOpenLibrary,
+                        onOpenSettings = onOpenSettings,
+                        modifier = Modifier.graphicsLayer { alpha = entrance.value },
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+            }
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(12.dp))
 
             // --- Input card ---
             Column(
@@ -184,7 +250,51 @@ fun HomeScreen(
                     onSubmit = { runSearch(query) },
                     engine = settings.engine,
                     focusRequester = focusRequester,
+                    onFocusChanged = { fieldFocused = it },
                 )
+
+                // Quick mode: the result-type picker sits right under the field.
+                AnimatedVisibility(
+                    visible = quickMode,
+                    enter = fadeIn(Motion.effectsDefault()) + expandVertically(Motion.sizeSpring),
+                    exit = fadeOut(Motion.effectsFast()) + shrinkVertically(Motion.sizeSpring),
+                ) {
+                    Column {
+                        Spacer(Modifier.height(12.dp))
+                        VerticalSelector(
+                            verticals = SearchVertical.entries
+                                .filter { settings.engine.supports(it) },
+                            selected = vertical,
+                            onSelect = onVerticalChange,
+                        )
+                    }
+                }
+            }
+
+            // Quick mode: the engine rail, full width as on the normal screen.
+            AnimatedVisibility(
+                visible = quickMode,
+                enter = fadeIn(Motion.effectsDefault()) + expandVertically(Motion.sizeSpring),
+                exit = fadeOut(Motion.effectsFast()) + shrinkVertically(Motion.sizeSpring),
+            ) {
+                Column {
+                    Spacer(Modifier.height(12.dp))
+                    EngineRail(
+                        engines = SearchEngine.ALL,
+                        selected = settings.engine,
+                        onSelect = onEngineChange,
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .graphicsLayer {
+                        alpha = entrance.value
+                        translationY = (1f - entrance.value) * 40.dp.toPx()
+                    },
+            ) {
 
                 AnimatedVisibility(
                     visible = suggestionsVisible,
@@ -200,7 +310,7 @@ fun HomeScreen(
                 }
 
                 AnimatedVisibility(
-                    visible = !suggestionsVisible,
+                    visible = !suggestionsVisible && !quickMode,
                     enter = fadeIn(Motion.effectsDefault()) + expandVertically(Motion.sizeSpring),
                     exit = fadeOut(Motion.effectsFast()) + shrinkVertically(Motion.sizeSpring),
                 ) {
@@ -228,7 +338,7 @@ fun HomeScreen(
             }
 
             AnimatedVisibility(
-                visible = !suggestionsVisible,
+                visible = !suggestionsVisible && !quickMode,
                 enter = fadeIn(Motion.effectsDefault()),
                 exit = fadeOut(Motion.effectsFast()),
             ) {

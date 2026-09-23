@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_container">@android:color/system_accent2_700</color>
+    <color name="widget_on_container">@android:color/system_accent2_100</color>
+    <color name="widget_primary">@android:color/system_accent1_200</color>
+    <color name="widget_on_primary">@android:color/system_accent1_800</color>
+</resources>

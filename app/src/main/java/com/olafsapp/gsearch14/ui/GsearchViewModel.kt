@@ -1,6 +1,7 @@
 package com.olafsapp.gsearch14.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,8 +20,11 @@ import com.olafsapp.gsearch14.data.repo.AccentPalette
 import com.olafsapp.gsearch14.data.repo.AppSettings
 import com.olafsapp.gsearch14.data.repo.OpenTarget
 import com.olafsapp.gsearch14.data.repo.ThemeMode
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -29,6 +33,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 
 /** One autocomplete row. */
 data class Suggestion(val text: String, val fromHistory: Boolean)
@@ -46,6 +51,14 @@ class GsearchViewModel(application: Application) : AndroidViewModel(application)
     private val container = application.appContainer
     private val settingsRepo = container.settings
     private val libraryRepo = container.library
+
+    /**
+     * Scope for storage writes. DataStore throws on I/O failure (a full disk, say); that
+     * should cost one lost write, not crash the app from inside a click handler.
+     */
+    private val safeScope: CoroutineScope = viewModelScope + CoroutineExceptionHandler { _, e ->
+        Log.w("Gsearch", "Storage write failed", e)
+    }
 
     val settings: StateFlow<AppSettings> = settingsRepo.settings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppSettings())
@@ -102,7 +115,8 @@ class GsearchViewModel(application: Application) : AndroidViewModel(application)
 
                 emit(fromHistory + remote)
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+        }.catch { emit(emptyList()) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     // --- Input -------------------------------------------------------------------
 
@@ -131,7 +145,7 @@ class GsearchViewModel(application: Application) : AndroidViewModel(application)
         val aiFree = current.aiFree || engine.aiFreeSupport == AiFreeSupport.ALWAYS_AI_FREE
 
         if (!current.incognito) {
-            viewModelScope.launch {
+            safeScope.launch {
                 libraryRepo.recordSearch(trimmed, engine.id, effectiveVertical, current.aiFree)
             }
         }
@@ -148,7 +162,7 @@ class GsearchViewModel(application: Application) : AndroidViewModel(application)
         val engine = SearchEngine.byId(entry.engineId)
         query = entry.query
         vertical = entry.vertical
-        viewModelScope.launch {
+        safeScope.launch {
             settingsRepo.setEngine(entry.engineId)
             if (engine.aiFreeSupport == AiFreeSupport.VIA_URL) {
                 settingsRepo.setAiFree(entry.aiFree)
@@ -167,68 +181,68 @@ class GsearchViewModel(application: Application) : AndroidViewModel(application)
 
     // --- Settings ----------------------------------------------------------------
 
-    fun selectEngine(engine: SearchEngine) = viewModelScope.launch {
+    fun selectEngine(engine: SearchEngine) = safeScope.launch {
         settingsRepo.setEngine(engine.id)
         // Keep the vertical valid for the new engine rather than silently searching the web
         // when the user had, say, Videos selected.
         if (!engine.supports(vertical)) vertical = SearchVertical.WEB
     }
 
-    fun setAiFree(value: Boolean) = viewModelScope.launch { settingsRepo.setAiFree(value) }
-    fun setThemeMode(value: ThemeMode) = viewModelScope.launch { settingsRepo.setThemeMode(value) }
+    fun setAiFree(value: Boolean) = safeScope.launch { settingsRepo.setAiFree(value) }
+    fun setThemeMode(value: ThemeMode) = safeScope.launch { settingsRepo.setThemeMode(value) }
     fun setDynamicColor(value: Boolean) =
-        viewModelScope.launch { settingsRepo.setDynamicColor(value) }
+        safeScope.launch { settingsRepo.setDynamicColor(value) }
 
-    fun setAccent(value: AccentPalette) = viewModelScope.launch { settingsRepo.setAccent(value) }
+    fun setAccent(value: AccentPalette) = safeScope.launch { settingsRepo.setAccent(value) }
     fun setPureBlackDark(value: Boolean) =
-        viewModelScope.launch { settingsRepo.setPureBlackDark(value) }
+        safeScope.launch { settingsRepo.setPureBlackDark(value) }
 
     fun setOpenTarget(value: OpenTarget) =
-        viewModelScope.launch { settingsRepo.setOpenTarget(value) }
+        safeScope.launch { settingsRepo.setOpenTarget(value) }
 
     fun setSuggestionsEnabled(value: Boolean) =
-        viewModelScope.launch { settingsRepo.setSuggestionsEnabled(value) }
+        safeScope.launch { settingsRepo.setSuggestionsEnabled(value) }
 
-    fun setIncognito(value: Boolean) = viewModelScope.launch { settingsRepo.setIncognito(value) }
+    fun setIncognito(value: Boolean) = safeScope.launch { settingsRepo.setIncognito(value) }
     fun setHapticsEnabled(value: Boolean) =
-        viewModelScope.launch { settingsRepo.setHapticsEnabled(value) }
+        safeScope.launch { settingsRepo.setHapticsEnabled(value) }
 
     fun setBlockThirdPartyCookies(value: Boolean) =
-        viewModelScope.launch { settingsRepo.setBlockThirdPartyCookies(value) }
+        safeScope.launch { settingsRepo.setBlockThirdPartyCookies(value) }
 
     // --- Library -----------------------------------------------------------------
 
-    fun deleteHistoryEntry(entry: HistoryEntry) = viewModelScope.launch {
+    fun deleteHistoryEntry(entry: HistoryEntry) = safeScope.launch {
         libraryRepo.deleteHistoryEntry(entry.id)
     }
 
-    fun restoreHistoryEntry(entry: HistoryEntry) = viewModelScope.launch {
+    fun restoreHistoryEntry(entry: HistoryEntry) = safeScope.launch {
         libraryRepo.restoreHistoryEntry(entry)
     }
 
-    fun togglePinned(entry: HistoryEntry) = viewModelScope.launch {
+    fun togglePinned(entry: HistoryEntry) = safeScope.launch {
         libraryRepo.togglePinned(entry.id)
     }
 
-    fun clearHistory() = viewModelScope.launch { libraryRepo.clearHistory(keepPinned = true) }
+    fun clearHistory() = safeScope.launch { libraryRepo.clearHistory(keepPinned = true) }
 
-    fun addBookmark(title: String, url: String) = viewModelScope.launch {
+    fun addBookmark(title: String, url: String) = safeScope.launch {
         libraryRepo.addBookmark(title, url, settings.value.engine.id)
     }
 
-    fun removeBookmarkByUrl(url: String) = viewModelScope.launch {
+    fun removeBookmarkByUrl(url: String) = safeScope.launch {
         libraryRepo.removeBookmarkByUrl(url)
     }
 
-    fun removeBookmark(bookmark: Bookmark) = viewModelScope.launch {
+    fun removeBookmark(bookmark: Bookmark) = safeScope.launch {
         libraryRepo.removeBookmark(bookmark.id)
     }
 
-    fun restoreBookmark(bookmark: Bookmark) = viewModelScope.launch {
+    fun restoreBookmark(bookmark: Bookmark) = safeScope.launch {
         libraryRepo.restoreBookmark(bookmark)
     }
 
-    fun clearBookmarks() = viewModelScope.launch { libraryRepo.clearBookmarks() }
+    fun clearBookmarks() = safeScope.launch { libraryRepo.clearBookmarks() }
 
     fun isBookmarked(url: String): Boolean = library.value.bookmarks.any { it.url == url }
 }

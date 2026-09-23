@@ -416,12 +416,16 @@ private fun stringResourceFor(target: OpenTarget): Pair<String, String> = when (
 
 /** Wipes what the in-app reader stored — cookies, HTML5 storage and the page cache. */
 private fun clearBrowsingData(context: android.content.Context) {
-    CookieManager.getInstance().removeAllCookies(null)
-    CookieManager.getInstance().flush()
-    WebStorage.getInstance().deleteAllData()
-    WebView(context).apply {
-        clearCache(true)
-        clearHistory()
-        destroy()
+    // Every one of these touches the system WebView, which may be missing or mid-update.
+    // With no WebView there is also no reader data to clear, so failing quietly is correct.
+    runCatching {
+        CookieManager.getInstance().removeAllCookies(null)
+        CookieManager.getInstance().flush()
+        WebStorage.getInstance().deleteAllData()
+        WebView(context).apply {
+            clearCache(true)
+            clearHistory()
+            destroy()
+        }
     }
 }

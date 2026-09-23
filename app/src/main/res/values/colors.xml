@@ -4,4 +4,11 @@
          screen, the adaptive icon and the Glance widget fallback. Everything the UI
          itself draws comes from the Compose colour scheme in ui/theme/Color.kt. -->
     <color name="splash_background">#FBF8FF</color>
+
+    <!-- Static widget preview colours for launchers without Material You (pre-Android 12).
+         values-v31 swaps them for the system palette so the preview matches the widget. -->
+    <color name="widget_container">#DDE1F9</color>
+    <color name="widget_on_container">#161B2C</color>
+    <color name="widget_primary">#4A5A92</color>
+    <color name="widget_on_primary">#FFFFFF</color>
 </resources>
