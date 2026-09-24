@@ -6,6 +6,14 @@
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white) ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white) ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white) ![License](https://img.shields.io/badge/License-GPL%20v3-blue?style=for-the-badge)
 
+<!-- INSTALL BUTTONS START -->
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.olafsapp.gsearch14"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"></a>
+  <a href="https://github.com/ProfessorQuantumUniverse/Gsearch_14/releases/latest"><img src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.png" alt="Get it on GitHub" height="80"></a>
+  <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/ProfessorQuantumUniverse/Gsearch_14"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a>
+</p>
+<!-- INSTALL BUTTONS END -->
+
 </div>
 
 ---
